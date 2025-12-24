@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Appointment confirmed{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-success shadow-lg rounded-3">
+                <div class="card-body text-center">
+
+                    <h2 class="text-success mb-4">✅ Appointment confirmed!</h2>
+
+                    <p class="fs-5"><strong>Doctor:</strong> Dr. {{ rendezVous.medecin.nom }} {{ rendezVous.medecin.prenom }}</p>
+                    <p class="fs-5"><strong>Date & Time:</strong> {{ rendezVous.dateHeure|date('d/m/Y H:i') }}</p>
+
+                    <div class="mt-4">
+                        <a href="{{ path('app_accueil') }}" class="btn btn-primary me-2">Back to home</a>
+
+                        {# Bouton d’annulation — tu peux relier à un route spécifique plus tard #}
+                        <a href="{{ path('rendez_vous_annuler', { id: rendezVous.id }) }}" class="btn btn-outline-danger">
+                            Cancel this appointment
+                        </a>
+
+                        {# Remplace href="#" par path('rendez_vous_annuler', { id: rendezVous.id }) quand l’action existe #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
