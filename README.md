@@ -1,49 +1,68 @@
-# Medical System
+# Medical Appointment Management System
 
-Medical System is a **Symfony-based web application** designed to manage patients, doctors, and appointments efficiently.  
-It provides a complete system for medical administration, including user management, patient records, and appointment scheduling.
+A Symfony web application for managing patient and doctor profiles, doctor availability, and appointments. The French-language interface includes authentication, role-restricted admin and patient areas, appointment booking and cancellation flows, notifications, password reset, and an EasyAdmin dashboard.
 
----
+This is an academic application prototype. The current code models users, patients, doctors, availability, appointments, contacts, and notifications; it does not include a dedicated medical-record entity. Use synthetic data only and do not deploy it for real patient information without an independent privacy and security review.
 
-## **Features**
+## Architecture
 
-| Feature | Description |
-|---------|-------------|
-| User Authentication | Secure login for Admin, Doctor, and Patient roles. |
-| Patient Management | Add, edit, delete, and view patient information. |
-| Doctor Management | Manage doctors' profiles, specialties, and availability. |
-| Appointment Scheduling | Schedule, reschedule, and cancel appointments. |
-| Medical Records | Store and track patient medical history and treatments. |
-| Role-based Access | Different features available depending on user role. |
+```mermaid
+flowchart LR
+  Browser[Browser]
+  Symfony[Symfony 7.3 controllers, forms, and Twig]
+  Doctrine[Doctrine ORM and repositories]
+  DB[(PostgreSQL 16)]
+  Admin[EasyAdmin dashboard]
+  Mail[Symfony Mailer]
+  Mailpit[Mailpit development inbox]
+  Browser --> Symfony --> Doctrine --> DB
+  Symfony --> Admin
+  Symfony --> Mail --> Mailpit
+```
 
----
+The repository also includes a [class diagram](Class-Diagram.png). Docker Compose provides PostgreSQL and, in the development override, Mailpit; it does not containerize the PHP application.
 
-## **User Roles**
+## Technology
 
-| Role | Permissions |
-|------|------------|
-| Admin | Full access: manage users, doctors, patients, and appointments. |
-| Doctor | Access to patient records, appointments, and personal profile. |
-| Patient | Access to personal profile, view appointments, and medical records. |
+- PHP 8.2+
+- Symfony 7.3, Twig, Doctrine ORM, and Doctrine Migrations
+- PostgreSQL 16
+- EasyAdmin, Symfony Security, Forms, Validator, Rate Limiter, and Reset Password bundle
+- PHPUnit tests under `tests/`
+- Docker Compose for local PostgreSQL and Mailpit services
 
----
+## Run locally
 
-## **System Requirements**
-
-| Requirement | Version / Notes |
-|-------------|----------------|
-| PHP | 8.x or higher |
-| Symfony | 6.x |
-| MySQL | 5.7 or higher |
-| Web Server | Apache / Nginx |
-| Composer | Latest version |
-
----
-
-## **Installation**
-
-1. Clone the repository:
+Prerequisites: PHP 8.2+, Composer, PostgreSQL support, Docker Compose, and the Symfony CLI.
 
 ```bash
 git clone https://github.com/wejden123cherif/Symfony-Project.git
 cd Symfony-Project
+composer install
+docker compose up -d database mailer
+```
+
+The Compose override publishes the database and Mailpit ports on the host. Use `docker compose port database 5432` (and `docker compose port mailer 1025`) to check the mapped ports, then configure `DATABASE_URL` and `MAILER_DSN` in an ignored `.env.local` file for your local environment. Do not commit `.env.local` or reuse development secrets in a deployment.
+
+Apply the database migrations and start the Symfony development server:
+
+```bash
+php bin/console doctrine:migrations:migrate
+symfony server:start
+```
+
+Run the checked-in PHPUnit tests with:
+
+```bash
+php bin/phpunit
+```
+
+## Security notes
+
+- The checked-in `.env`, `.env.dev`, and `.env.test` files contain development configuration. Keep real application secrets and production database credentials in local, untracked configuration or a secret manager.
+- Use synthetic patient data only. The repository does not establish that the application is suitable for handling real health information.
+- `docs/SECURITY_MITIGATIONS.md` contains project security notes; it is not an independent security assessment.
+
+## Visual evidence
+
+The repository includes a class diagram but no verified screenshot of a running application. Genuine screenshots of the booking flow, availability management, and admin dashboard with synthetic data would make the project easier to evaluate.
